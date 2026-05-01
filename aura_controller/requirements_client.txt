@@ -9,3 +9,6 @@ keyboard  # For hotkey emulation
 pyobjc-core; sys_platform == 'darwin'
 pyobjc; sys_platform == 'darwin'
 pywin32; sys_platform == 'win32'
+Pillow
+mediapipe
+vosk
