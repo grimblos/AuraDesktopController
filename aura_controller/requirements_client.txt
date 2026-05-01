@@ -1,0 +1,11 @@
+# Aura Client Requirements (Main PC)
+opencv-python
+PyAudio
+customtkinter
+cryptography
+zeroconf
+requests
+keyboard  # For hotkey emulation
+pyobjc-core; sys_platform == 'darwin'
+pyobjc; sys_platform == 'darwin'
+pywin32; sys_platform == 'win32'

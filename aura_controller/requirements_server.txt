@@ -1,0 +1,7 @@
+# Aura Server Requirements (Processing Box)
+mediapipe
+vosk
+opencv-python-headless  # Headless version for servers
+cryptography
+zeroconf
+numpy
