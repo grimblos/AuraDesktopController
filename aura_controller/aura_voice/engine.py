@@ -36,31 +36,77 @@ class VoiceEngine:
             # partial = json.loads(self.rec.PartialResult())
             return None
 
-    def run(self, event_queue: Queue, audio_source=None):
+    def run(self, event_queue: Queue, control_queue: Queue = None, audio_source=None):
         """
         Main loop for audio capture and processing.
         Pushes detected command labels to the event_queue.
         """
-        # If audio_source is None, we'd use PyAudio locally.
-        # If it's a queue, we're in Remote Mode.
-        # TODO: Implement local PyAudio capture for standalone mode.
+        import pyaudio
         
-        while True:
-            if audio_source:
-                data = audio_source.get() # Get audio chunk from networking module
+        self.is_active = True
+        pa = None
+        stream = None
+        
+        # Initialize local PyAudio stream if no network source is provided
+        if audio_source is None:
+            try:
+                pa = pyaudio.PyAudio()
+                stream = pa.open(format=pyaudio.paInt16, channels=1, rate=16000, input=True, frames_per_buffer=4000)
+                stream.start_stream()
+                print("Microphone successfully initialized.")
+            except Exception as e:
+                print(f"Failed to initialize microphone: {e}")
+                return
+        
+        try:
+            while True:
+                # 1. Process Control Messages
+                if control_queue and not control_queue.empty():
+                    msg = control_queue.get()
+                    if msg.get("target") == "voice":
+                        if msg.get("action") == "stop":
+                            self.is_active = False
+                            print("Voice Engine Paused.")
+                        elif msg.get("action") == "start":
+                            self.is_active = True
+                            print("Voice Engine Resumed.")
+                        elif msg.get("action") == "set_wake_word":
+                            self.wake_word = msg.get("value", self.wake_word).lower()
+                            print(f"Wake word changed to: {self.wake_word}")
+
+                if not self.is_active:
+                    import time
+                    time.sleep(0.1)
+                    continue
+
+                # 2. Capture Audio Chunk
+                if audio_source:
+                    data = audio_source.get() 
+                else:
+                    data = stream.read(4000, exception_on_overflow=False)
+                
+                if not data: continue
+
                 text = self.process_audio(data)
                 
                 if text:
-                    print(f"Recognized: {text}")
-                    # Simple Wake-Word Check
+                    print(f"[Aura Ears] Heard: '{text}'")
+                    # Wake-Word logic
                     if self.wake_word in text:
-                        # Extract the command after the wake word
-                        command = text.split(self.wake_word)[-1].strip().upper().replace(" ", "_")
-                        if command:
-                            event_queue.put({"engine": "voice", "label": command})
-            
-            # TODO: Advanced models can implement fuzzy string matching or 
-            # Intent Classification (e.g., mapping 'Shut down the camera' to 'APP_STOP_GESTURE').
+                        command_text = text.split(self.wake_word)[-1].strip()
+                        if command_text:
+                            # Standardize command (e.g. "volume up" -> "VOLUME_UP")
+                            command_label = command_text.upper().replace(" ", "_")
+                            print(f"[Aura Core] Voice Trigger Issued: {command_label}")
+                            event_queue.put({"engine": "voice", "label": command_label})
+        except KeyboardInterrupt:
+            pass
+        finally:
+            if stream:
+                stream.stop_stream()
+                stream.close()
+            if pa:
+                pa.terminate()
 
     def stop(self):
         """

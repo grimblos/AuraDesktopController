@@ -1,0 +1,45 @@
+{
+    "mode": "local",
+    "server": {
+        "ip": "0.0.0.0",
+        "port": 5005,
+        "auto_discovery": true,
+        "encryption": {
+            "enabled": false,
+            "secret_key": "generate-a-secure-key-here"
+        }
+    },
+    "engines": {
+        "gesture": {
+            "enabled": true,
+            "fps_cap": 20,
+            "min_confidence": 0.7,
+            "camera_id": 0,
+            "show_preview": true
+        },
+        "voice": {
+            "enabled": true,
+            "model_path": "models/vosk-model-small-en-us-0.15",
+            "wake_word": "computer"
+        }
+    },
+    "ui": {
+        "theme": "dark",
+        "show_osd": true,
+        "osd_transparency": 0.7
+    },
+    "mappings": {
+        "PALM_OPEN": {
+            "type": "hotkey",
+            "value": "volume up"
+        },
+        "FIST": {
+            "type": "hotkey",
+            "value": "volume mute"
+        },
+        "POINTING": {
+            "type": "hotkey",
+            "value": "volume down"
+        }
+    }
+}
