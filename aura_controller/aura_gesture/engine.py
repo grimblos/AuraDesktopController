@@ -34,27 +34,45 @@ class GestureEngine:
             return None
             
         landmarks = results.hand_landmarks[0]
+        handedness = results.handedness[0][0].category_name  # "Left" or "Right"
         
-        tips = [8, 12, 16, 20]
-        fingers_up = []
+        # Fingers: [Thumb, Index, Middle, Ring, Pinky]
+        fingers_up = [False, False, False, False, False]
         
-        # Thumb
-        if landmarks[4].x < landmarks[3].x:
-            fingers_up.append(1)
+        # Thumb: compare x coordinates based on handedness
+        # Note: MediaPipe image coords are mirrored. "Left" hand in image is actually right hand of user if mirrored.
+        if handedness == "Right":
+            if landmarks[4].x < landmarks[3].x: fingers_up[0] = True
+        else:
+            if landmarks[4].x > landmarks[3].x: fingers_up[0] = True
             
-        # Other fingers
-        for tip in tips:
+        # Other fingers: compare tip y to pip y
+        tips = [8, 12, 16, 20]
+        for i, tip in enumerate(tips):
             if landmarks[tip].y < landmarks[tip - 2].y:
-                fingers_up.append(1)
+                fingers_up[i+1] = True
                 
         count = sum(fingers_up)
         
+        # Classification
         if count == 5: return "PALM_OPEN"
         if count == 0: return "FIST"
         
-        # Pointing: index up, others down
-        if count == 1 and landmarks[8].y < landmarks[6].y: 
+        # POINTING: Only Index is up
+        if fingers_up == [False, True, False, False, False]: 
             return "POINTING"
+            
+        # PEACE_SIGN: Index and Middle are up
+        if fingers_up == [False, True, True, False, False]:
+            return "PEACE_SIGN"
+            
+        # THUMBS_UP: Only Thumb is up
+        if fingers_up == [True, False, False, False, False]:
+            return "THUMBS_UP"
+            
+        # ROCK_ON: Index and Pinky up (thumb can be in or out)
+        if fingers_up[1] and fingers_up[4] and not fingers_up[2] and not fingers_up[3]:
+            return "ROCK_ON"
             
         return None
 
@@ -82,14 +100,6 @@ class GestureEngine:
                         self.show_preview = msg.get("value", False)
                         if not self.show_preview:
                             cv2.destroyAllWindows()
-                    elif msg.get("action") == "stop":
-                        self.is_active = False
-                    elif msg.get("action") == "start":
-                        self.is_active = True
-
-            if not self.is_active:
-                time.sleep(0.1)
-                continue
 
             # 2. Capture Frame
             if cap:

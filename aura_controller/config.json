@@ -1,19 +1,18 @@
 {
     "mode": "local",
     "server": {
-        "ip": "0.0.0.0",
+        "ip": "127.0.0.1",
         "port": 5005,
         "auto_discovery": true,
         "encryption": {
             "enabled": false,
-            "secret_key": "generate-a-secure-key-here"
+            "secret_key": ""
         }
     },
     "engines": {
         "gesture": {
             "enabled": true,
             "fps_cap": 20,
-            "min_confidence": 0.7,
             "camera_id": 0,
             "show_preview": true
         },
@@ -23,23 +22,60 @@
             "wake_word": "computer"
         }
     },
-    "ui": {
-        "theme": "dark",
-        "show_osd": true,
-        "osd_transparency": 0.7
-    },
-    "mappings": {
-        "PALM_OPEN": {
+    "defined_gestures": [
+        "PALM_OPEN",
+        "FIST",
+        "POINTING",
+        "PEACE_SIGN",
+        "THUMBS_UP",
+        "ROCK_ON"
+    ],
+    "macros": {
+        "Volume Up": {
             "type": "hotkey",
             "value": "volume up"
         },
-        "FIST": {
+        "Volume Down": {
+            "type": "hotkey",
+            "value": "volume down"
+        },
+        "Mute Audio": {
             "type": "hotkey",
             "value": "volume mute"
         },
-        "POINTING": {
-            "type": "hotkey",
-            "value": "volume down"
+        "Toggle Gestures": {
+            "type": "internal",
+            "value": "TOGGLE_GESTURES"
+        },
+        "Toggle Voice": {
+            "type": "internal",
+            "value": "TOGGLE_VOICE"
+        },
+        "Sleep All": {
+            "type": "internal",
+            "value": "SLEEP_ALL"
+        },
+        "Wake All": {
+            "type": "internal",
+            "value": "WAKE_ALL"
+        }
+    },
+    "triggers": {
+        "Mute Audio": {
+            "voice": "mute",
+            "gesture": "ROCK_ON"
+        },
+        "Volume Up": {
+            "voice": "volume up",
+            "gesture": "THUMBS_UP"
+        },
+        "Volume Down": {
+            "voice": "volume down",
+            "gesture": "POINTING"
+        },
+        "Toggle Gestures": {
+            "voice": "blind",
+            "gesture": "PEACE_SIGN"
         }
     }
 }

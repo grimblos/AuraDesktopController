@@ -64,20 +64,9 @@ class VoiceEngine:
                 if control_queue and not control_queue.empty():
                     msg = control_queue.get()
                     if msg.get("target") == "voice":
-                        if msg.get("action") == "stop":
-                            self.is_active = False
-                            print("Voice Engine Paused.")
-                        elif msg.get("action") == "start":
-                            self.is_active = True
-                            print("Voice Engine Resumed.")
-                        elif msg.get("action") == "set_wake_word":
+                        if msg.get("action") == "set_wake_word":
                             self.wake_word = msg.get("value", self.wake_word).lower()
                             print(f"Wake word changed to: {self.wake_word}")
-
-                if not self.is_active:
-                    import time
-                    time.sleep(0.1)
-                    continue
 
                 # 2. Capture Audio Chunk
                 if audio_source:
@@ -90,13 +79,13 @@ class VoiceEngine:
                 text = self.process_audio(data)
                 
                 if text:
-                    print(f"[Aura Ears] Heard: '{text}'")
                     # Wake-Word logic
                     if self.wake_word in text:
+                        print(f"[Aura Ears] Heard: '{text}'")
                         command_text = text.split(self.wake_word)[-1].strip()
                         if command_text:
-                            # Standardize command (e.g. "volume up" -> "VOLUME_UP")
                             command_label = command_text.upper().replace(" ", "_")
+                            
                             print(f"[Aura Core] Voice Trigger Issued: {command_label}")
                             event_queue.put({"engine": "voice", "label": command_label})
         except KeyboardInterrupt:

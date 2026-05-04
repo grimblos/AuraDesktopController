@@ -9,35 +9,18 @@ class CommandRouter:
         self.control_queue = control_queue
         
         # Internal Command Mapping
-        self.internal_commands = {
-            "APP_STOP_GESTURE": lambda: self.control_queue.put({"target": "gesture", "action": "stop"}),
-            "APP_START_GESTURE": lambda: self.control_queue.put({"target": "gesture", "action": "start"}),
-            "APP_STOP_VOICE": lambda: self.control_queue.put({"target": "voice", "action": "stop"}),
-            "APP_START_VOICE": lambda: self.control_queue.put({"target": "voice", "action": "start"}),
-            "APP_SLEEP": self._go_to_sleep,
-            "APP_WAKE": self._wake_up
-        }
+        self.internal_commands = {}
         
-    def route(self, trigger_label: str):
+    def route(self, trigger_label: str, engine_name: str = None):
         """
-        Receives a trigger (e.g., 'MUTE_MIC') and decides where it goes.
+        Receives a trigger (e.g., 'MUTE') and decides where it goes.
+        If an external action, prepends engine_name (e.g., 'VOICE_MUTE').
         """
-        print(f"Routing Trigger: {trigger_label}")
+        print(f"Routing Trigger: {trigger_label} (Engine: {engine_name})")
         
-        if trigger_label in self.internal_commands:
-            self.internal_commands[trigger_label]()
-        else:
-            # If not an internal command, pass to the automation manager
-            self.automation_manager.execute(trigger_label)
+        # Format label for triggers dict (e.g. "GESTURE_FIST")
+        formatted_label = trigger_label
+        if engine_name:
+            formatted_label = f"{engine_name.upper()}_{trigger_label}"
             
-    def _go_to_sleep(self):
-        """Disables both engines."""
-        self.control_queue.put({"target": "gesture", "action": "stop"})
-        self.control_queue.put({"target": "voice", "action": "stop"})
-        print("Aura entering sleep mode...")
-
-    def _wake_up(self):
-        """Enables both engines."""
-        self.control_queue.put({"target": "gesture", "action": "start"})
-        self.control_queue.put({"target": "voice", "action": "start"})
-        print("Aura waking up...")
+        self.automation_manager.execute(formatted_label)

@@ -21,10 +21,27 @@ class ConfigManager:
                 "gesture": {"enabled": True, "fps_cap": 20, "camera_id": 0},
                 "voice": {"enabled": True, "model_path": "models/vosk-model-small-en-us-0.15", "wake_word": "aura"}
             },
-            "mappings": {
-                "VOLUME_UP": {"type": "hotkey", "value": "volume up"},
-                "VOLUME_DOWN": {"type": "hotkey", "value": "volume down"},
-                "MUTE": {"type": "hotkey", "value": "volume mute"}
+            "defined_gestures": [
+                "PALM_OPEN",
+                "FIST",
+                "POINTING",
+                "PEACE_SIGN",
+                "THUMBS_UP",
+                "ROCK_ON"
+            ],
+            "macros": {
+                "Toggle Gestures": {"type": "internal", "value": "TOGGLE_GESTURES"},
+                "Toggle Voice": {"type": "internal", "value": "TOGGLE_VOICE"},
+                "Sleep All": {"type": "internal", "value": "SLEEP_ALL"},
+                "Wake All": {"type": "internal", "value": "WAKE_ALL"},
+                "Volume Up": {"type": "hotkey", "value": "volume up"},
+                "Volume Down": {"type": "hotkey", "value": "volume down"},
+                "Mute Audio": {"type": "hotkey", "value": "volume mute"}
+            },
+            "triggers": {
+                "Mute Audio": { "voice": "mute", "gesture": "FIST" },
+                "Volume Up":  { "voice": "volume up", "gesture": "PALM_OPEN" },
+                "Volume Down": { "voice": "volume down", "gesture": "POINTING" }
             }
         }
         self.config = self.load()
