@@ -43,21 +43,17 @@
             "type": "hotkey",
             "value": "volume mute"
         },
-        "Toggle Gestures": {
-            "type": "internal",
-            "value": "TOGGLE_GESTURES"
+        "Pause": {
+            "type": "hotkey",
+            "value": "play/pause media"
         },
-        "Toggle Voice": {
-            "type": "internal",
-            "value": "TOGGLE_VOICE"
+        "Next Song": {
+            "type": "hotkey",
+            "value": "next track"
         },
-        "Sleep All": {
-            "type": "internal",
-            "value": "SLEEP_ALL"
-        },
-        "Wake All": {
-            "type": "internal",
-            "value": "WAKE_ALL"
+        "Previous Song": {
+            "type": "hotkey",
+            "value": "previous track"
         }
     },
     "triggers": {
@@ -76,6 +72,16 @@
         "Toggle Gestures": {
             "voice": "blind",
             "gesture": "PEACE_SIGN"
+        },
+        "Pause": {
+            "voice": "pause",
+            "gesture": "PALM_OPEN"
+        },
+        "Next Song": {
+            "voice": "next"
+        },
+        "Previous Song": {
+            "voice": "previous"
         }
     }
 }
